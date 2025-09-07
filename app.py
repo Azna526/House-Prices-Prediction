@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
+import seaborn as sns
 import zipfile
 
 # ================================
@@ -75,28 +76,23 @@ if not selected_features:
 # Train model
 model = train_model(selected_features)
 
-# Histogram of SalePrice
+# Histogram of SalePrice (Seaborn)
 st.subheader("📊 SalePrice Distribution")
 fig, ax = plt.subplots()
-ax.hist(df["SalePrice"], bins=40, color="skyblue", edgecolor="black")
+sns.histplot(df["SalePrice"], bins=40, kde=True, color="skyblue", ax=ax)
 ax.set_xlabel("Sale Price")
 ax.set_ylabel("Count")
 st.pyplot(fig)
 
-# Scatter plot (only if single feature)
+# Scatter plot with regression line (only if single feature)
 if len(selected_features) == 1:
     feature = selected_features[0]
     st.subheader(f"📈 {feature} vs Sale Price")
     fig, ax = plt.subplots()
-    ax.scatter(df[feature], df["SalePrice"], alpha=0.5, label="Data points")
+    sns.scatterplot(x=df[feature], y=df["SalePrice"], ax=ax, alpha=0.6, edgecolor=None)
+    sns.regplot(x=df[feature], y=df["SalePrice"], ax=ax, scatter=False, color="red")
     ax.set_xlabel(feature)
     ax.set_ylabel("Sale Price")
-
-    # Regression line
-    X_line = pd.DataFrame({feature: range(int(df[feature].min()), int(df[feature].max()))})
-    y_line = model.predict(X_line)
-    ax.plot(X_line, y_line, color="red", linewidth=2, label="Regression line")
-    ax.legend()
     st.pyplot(fig)
 
 # Prediction section
