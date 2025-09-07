@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import streamlit as st
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 import zipfile
@@ -52,7 +53,9 @@ def train_model(features):
     y = df["SalePrice"]
     model = LinearRegression()
     model.fit(X, y)
-    return model
+    y_pred = model.predict(X)
+    score = r2_score(y, y_pred)
+    return model, score
 
 # ================================
 # Streamlit UI
@@ -74,7 +77,11 @@ if not selected_features:
     st.stop()
 
 # Train model
-model = train_model(selected_features)
+model, r2 = train_model(selected_features)
+
+# Show R² score
+st.subheader("📐 Model Performance")
+st.write(f"R² Score: **{r2:.3f}** (1.0 = perfect fit)")
 
 # Histogram of SalePrice (Seaborn)
 st.subheader("📊 SalePrice Distribution")
